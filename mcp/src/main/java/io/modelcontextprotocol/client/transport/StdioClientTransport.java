@@ -10,6 +10,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
@@ -21,6 +22,7 @@ import io.modelcontextprotocol.spec.McpClientTransport;
 import io.modelcontextprotocol.spec.McpSchema;
 import io.modelcontextprotocol.spec.McpSchema.JSONRPCMessage;
 import io.modelcontextprotocol.util.Assert;
+import io.modelcontextprotocol.util.KillUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Flux;
@@ -357,7 +359,8 @@ public class StdioClientTransport implements McpClientTransport {
 		})).then(Mono.defer(() -> {
 			logger.debug("Sending TERM to process");
 			if (this.process != null) {
-				this.process.destroy();
+				// this.process.destroy();
+				KillUtil.killProcess(Arrays.asList(this.process.pid()));
 				return Mono.fromFuture(process.onExit());
 			}
 			else {
